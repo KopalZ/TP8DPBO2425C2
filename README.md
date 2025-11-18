@@ -1,10 +1,11 @@
 # Janji
 Saya Naufal Zahid dengan NIM 2405787 mengerjakan TP 8 dalam mata kuliah Desain dan Pemrograman Berorientasi Objek untuk keberkahanNya maka saya tidak melakukan kecurangan seperti yang telah dispesifikasikan. Aamiin
 
-# 🧙‍♂️ Sistem Manajemen Asrama Hogwarts — PHP Native (OOP + Prepared Statement)
+# Sistem Manajemen Dosen dan Mata Kuliah — PHP MVC
 
-Proyek ini merupakan implementasi website berbasis PHP Native dengan penerapan konsep Object-Oriented Programming (OOP) serta penggunaan Prepared Statement untuk seluruh interaksi dengan database.
-Aplikasi ini dirancang untuk mengelola data Asrama, Peran, dan Anggota Hogwarts, dengan fitur utama CRUD (Create, Read, Update, Delete) di setiap entitas.
+Proyek ini merupakan implementasi website berbasis PHP Native dengan penerapan pola arsitektur Model-View-Controller (MVC) untuk mengelola data Dosen, Mata Kuliah, dan Jadwal.
+
+Seluruh interaksi dengan database menggunakan Prepared Statement untuk menjamin keamanan dari serangan SQL Injection. Fitur utama yang diimplementasikan adalah CRUD (Create, Read, Update, Delete) untuk setiap entitas.
 
 ---
 
@@ -12,49 +13,55 @@ Aplikasi ini dirancang untuk mengelola data Asrama, Peran, dan Anggota Hogwarts,
 
 | Kategori | Detail |
 | :--- | :--- |
-| **Nama Repo** | `TP7DPBO2425C2` |
-| **Database** | `db_harrypotter` (3 tabel: film, peran, detail_peran) |
+| **Nama Repo** | `TP8DPBO2425C2` |
+| **Database** | `tp_mvc25` (3 tabel: Lecturer, Course, Schedule) |
 
 ---
 
-## 🎬 Tema Website: Sistem Manajemen Asrama Hogwarts
+## Tema Website: Sistem Informasi Dosen & Jadwal
 
-Website ini digunakan untuk mencatat dan menampilkan data asrama di Hogwarts, peran anggota, serta hubungan antar data.
-Setiap anggota memiliki peran tertentu dan tergabung dalam satu asrama.
+Website ini digunakan untuk mencatat dan menampilkan data Dosen, Mata Kuliah, dan Jadwal mengajar, serta hubungan relasi antar data.
 
 Contoh penggunaan:
-- Admin dapat menambahkan data asrama baru dan kepala asramanya.
-- Admin dapat menambahkan anggota baru dan menentukan asrama serta perannya.
-- Data asrama, peran, maupun anggota dapat diubah dan dihapus dengan mudah.
+- User dapat menambahkan data Dosen baru (termasuk NIDN dan email unik).
+- User dapat menambahkan Mata Kuliah baru (termasuk kode mata kuliah unik).
+- User dapat membuat Jadwal, menghubungkan Dosen tertentu dengan Mata Kuliah tertentu, hari, waktu, dan ruangan.
 
 ---
 
 ## 🗃️ Struktur Database
 
-### 1️⃣ Tabel `asrama`
+### 1️⃣ Tabel `lecturers`
 
 | Kolom | Tipe | Keterangan |
 | :--- | :--- | :--- |
-| `id_asrama` | INT (PK, AUTO_INCREMENT) | ID unik untuk asrama |
-| `nama_asrama` | VARCHAR(100) | Nama asrama (misal: Gryffindor, Slytherin) |
-| `kepala_asrama` | VARCHAR(100) | Nama kepala asrama |
+| `id` | INT (PK, AUTO_INCREMENT) | ID unik untuk Dosen |
+| `nama_asrama` | VARCHAR(100) | Nama Dosen |
+| `nidn` | VARCHAR(20) (UNIQUE) | Nomor Induk Dosen Nasional |
+| `phone` | VARCHAR(20) | Nomor Telepon |
+| `join_date` | DATE | Tanggal Masuk |
+| `email` | VARCHAR(100) (UNIQUE) | Email Dosen |
 
 ### 2️⃣ Tabel `peran`
 
 | Kolom | Tipe | Keterangan |
 | :--- | :--- | :--- |
-| `id_peran` | INT (PK, AUTO_INCREMENT) | ID unik untuk peran |
-| `nama` | VARCHAR(100) | Nama peran (misal: Prefect, Ketua Asrama, Murid biasa) |
+| `id` | INT (PK, AUTO_INCREMENT) | ID unik untuk Mata Kuliah |
+| `course_name` | VARCHAR(100) | Nama Mata Kuliah |
+| `course_code` | VARCHAR(10) (UNIQUE) | Kode Mata Kuliah |
+| `sks` | INT(2) | Jumlah SKS |
 
 ### 3️⃣ Tabel `anggota`
 
 | Kolom | Tipe | Keterangan |
 | :--- | :--- | :--- |
-| `id_anggota` | INT (PK, AUTO_INCREMENT) | ID unik untuk anggota |
-| `nama` | VARCHAR(100) | Nama anggota Hogwarts |
-| `id_asrama` | INT (FK → asrama.id_asrama) | Relasi ke tabel asrama |
-| `id_peran` | INT (FK → peran.id_peran) | Relasi ke tabel peran |
-| `tanggal_masuk` | DATE | Tanggal masuk ke Hogwarts |
+| `id` | INT (PK, AUTO_INCREMENT) | ID unik untuk Jadwal |
+| `lecturer_id` | INT (FK → lecturers.id) | Dosen yang Mengajar (Relasi) |
+| `course_id` | INT (FK → courses.id) | Mata Kuliah yang Diajarkan (Relasi) |
+| `day` | VARCHAR(10) | Hari Mengajar |
+| `time_start` | TIME | Waktu Mulai |
+| `time_end` | TIME | Waktu Selesai |
+| `room` | VARCHAR(20) | Ruangan |
 
 ---
 
@@ -62,71 +69,79 @@ Contoh penggunaan:
 
 | Entitas | Fitur | Deskripsi |
 | :--- | :--- | :--- |
-| **Asrama** | Create, Read, Update, Delete | Kelola data nama asrama dan kepala asrama. |
-| **Peran** | Create, Read, Update, Delete | Kelola daftar peran di Hogwarts. |
-| **Anggota** | Create, Read, Update, Delete | Kelola data anggota dan relasinya ke asrama serta peran. |
+| **Dosen** | Create, Read, Update, Delete | Kelola data dasar dosen, termasuk NIDN dan Email unik. |
+| **Mata Kuliah** | Create, Read, Update, Delete | Kelola data mata kuliah (Nama, Kode, SKS). |
+| **Jadwal** | Create, Read, Update, Delete | Kelola relasi Dosen & Mata Kuliah, termasuk Hari, Waktu, dan Ruangan. |
 
 ---
 
 ## 🏗️ Struktur Folder Proyek
 
 ```bash
-  TP7/
-  ├── Class/
-  │   ├── Asrama.php
-  │   ├── Anggota.php
-  │   └── Peran.php
-  │
+ TP8/
   ├── config/
-  │   └── db.php
+  │   └── connection.php          # Tempat setting koneksi DB
   │
-  ├── database/
-  │   └── db_harrypotter.sql
+  ├── controllers/
+  │   ├── LecturerController.php  # Otak CRUD Dosen
+  │   ├── CourseController.php    # Otak CRUD Mata Kuliah
+  │   └── ScheduleController.php  # Otak CRUD Jadwal
   │
-  ├── view/
-  │   ├── asrama.php
-  │   ├── anggota.php
-  │   └── peran.php
+  ├── models/
+  │   ├── Lecturer.php            # Kode SQL Dosen (CRUD)
+  │   ├── Course.php              # Kode SQL Mata Kuliah (CRUD)
+  │   └── Schedule.php            # Kode SQL Jadwal (CRUD + JOIN)
   │
-  ├── index.php
-  └── style.css
+  ├── views/                      
+  │   ├── course_create.php
+  │   ├── course_edit.php
+  │   ├── course_index.php
+  │   ├── lecturer_create.php
+  │   ├── lecturer_edit.php
+  │   ├── lecturer_index.php
+  │   ├── schedule_create.php
+  │   ├── schedule_edit.php
+  │   └── schedule_index.php
+  │
+  ├── index.php                   
+  ├── bootstrap.bundle.min.js    
+  ├── bootstrap.min.css           
+  └── jquery.min.js               
 ```
 
 ---
 
 ## Flow / Alur Program
 ### 1. index.php
-- Berfungsi sebagai halaman utama untuk navigasi antar tabel.
-- Menggunakan parameter `page` pada URL (`?page=asrama`, `?page=peran`, `?page=anggota`) untuk menampilkan view yang sesuai.
-
-### 2. class
-- Berisi representasi tiap entitas database dalam bentuk class OOP PHP.
-- Masing-masing memiliki fungsi `getAllData()`, `addData()`, `updateData()`, dan `deleteData()`.
+- Berfungsi sebagai titik masuk tunggal.
+- Menganalisis parameter `controller` dan `action` pada URL (`?controller=lecturer&action=create`).
+- Menginisialisasi Controller yang sesuai dan memanggil metode (Action) yang diminta.
   
-### 3. config/db.php
-- Mengatur koneksi ke database MySQL.
-- Koneksi digunakan oleh seluruh class untuk operasi CRUD.
+### 2. Controller
+- Mengambil Input (dari URL/Form POST).
+- Memanggil Model untuk memanipulasi data (misal: `create()`, `readAll()`)
+- Memilih View yang akan ditampilkan, melewatkan data dari Model ke View.
+  
+### 3. Model
+- Berinteraksi langsung dengan database.
+- Masing-masing memiliki fungsi CRUD: `readAll()`, `create()`, `update()`, dan `delete()`.
+- Menggunakan Prepared Statements (`mysqli->prepare`) untuk semua operasi yang melibatkan input pengguna.
 
-### 4. view/
-- Menyediakan tampilan (form & tabel) untuk tiap tabel:
-  - `asrama.php` untuk data asrama
-  - `peran.php` untuk data peran
-  - `anggota.php` untuk data anggota (relasi antar tabel ditampilkan dalam bentuk join)
-- Data ditampilkan dalam bentuk tabel dengan nomor urut dinamis (bukan ID database).
-
-### 5. style.css
-- Mengatur tampilan keseluruhan website agar lebih rapi dan konsisten antar halaman.
+### 4. View
+- Berisi kode HTML dan PHP minimal.
+- Bertanggung jawab hanya untuk menyajikan data yang diterima dari Controller.
+- Data tabel ditampilkan dengan Nomor Urut Dinamis menggunakan loop counter PHP.
 
 ---
 
 ## 💻 Cara Menjalankan
-1. Import file `db_harrypotter.sql` ke dalam **phpMyAdmin**.
-2. Pastikan koneksi database di `config/db.php` sesuai dengan konfigurasi lokal (username, password, dan nama database).
+1. Import file `.sql` Anda ke dalam database MySQL lokal bernama `tp_mvc25`.
+2. Pastikan `config/connection.php` sudah sesuai dengan username dan password database lokal Anda.
 3. Jalankan aplikasi di browser dengan membuka:
     ```bash
-    http://localhost/TP7/index.php
+    [http://localhost/TP7/index.php]
     ```
-4. Navigasi ke tiap halaman (Asrama, Peran, Anggota) melalui menu yang tersedia di halaman utama.
+4. Navigasi ke tiap halaman (Dosen, Mata Kuliah, Jadwal) melalui Navbar.
 
 ---
 
